@@ -3,6 +3,7 @@ import { X, Trash2, ShoppingBag, MessageCircle, ShieldCheck, CheckCircle2, Truck
 import { CartItem } from '../types';
 import { STORE_INFO, GOVERNORATES } from '../data/mockData';
 import { WheelPrize } from './LuckyWheelModal';
+import { handleImageError, normalizeImagePath } from '../utils/imageUtils';
 
 interface CartDrawerProps {
   isOpen: boolean;
@@ -183,10 +184,11 @@ ${couponLine}
                       className="p-3 bg-stone-50 rounded-xl border border-stone-200/80 flex gap-3 items-center justify-between"
                     >
                       <img
-                        src={item.product.image}
+                        src={normalizeImagePath(item.product.image)}
                         alt={item.product.title}
                         className="w-16 h-16 object-cover rounded-lg border border-stone-200 shrink-0"
                         referrerPolicy="no-referrer"
+                        onError={handleImageError}
                       />
 
                       <div className="flex-1 min-w-0 pr-1 space-y-1">

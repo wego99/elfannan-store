@@ -1,6 +1,7 @@
 import React, { useState, useRef } from 'react';
 import { X, Plus, Percent, Tag, Sparkles, Image as ImageIcon, ShieldCheck, Check, Upload, Camera, Trash2 } from 'lucide-react';
 import { Product } from '../types';
+import { handleImageError, normalizeImagePath } from '../utils/imageUtils';
 
 interface AddProductModalProps {
   isOpen: boolean;
@@ -9,10 +10,10 @@ interface AddProductModalProps {
 }
 
 const PRESET_IMAGES = [
-  { label: 'بيجاما قطيفة تايجر', url: '/src/assets/images/product_pajama_leopard_velvet_1791917784354.jpg' },
-  { label: 'بيجاما قطن كشمير فلورا', url: '/src/assets/images/product_pajama_cotton_pink_1791917783703.jpg' },
-  { label: 'طقم هودي صوف شتوي', url: '/src/assets/images/product_loungewear_winter_set_1791917785063.jpg' },
-  { label: 'كولكشن بيتي تركي فاخر', url: '/src/assets/images/hero_loungewear_banner_1791917782855.jpg' },
+  { label: 'بيجاما قطيفة تايجر', url: '/images/product_pajama_leopard_velvet.jpg' },
+  { label: 'بيجاما قطن كشمير فلورا', url: '/images/product_pajama_cotton_pink.jpg' },
+  { label: 'طقم هودي صوف شتوي', url: '/images/product_loungewear_winter_set.jpg' },
+  { label: 'كولكشن بيتي تركي فاخر', url: '/images/hero_loungewear_banner.jpg' },
 ];
 
 const PRESET_FABRICS = [
@@ -143,7 +144,8 @@ export const AddProductModal: React.FC<AddProductModalProps> = ({
       offers: 'عروض الأوكازيون والتخفيضات',
     };
 
-    const finalImage = uploadedImage || (customImageUrl.trim() ? customImageUrl.trim() : selectedImage);
+    const rawImage = uploadedImage || (customImageUrl.trim() ? customImageUrl.trim() : selectedImage);
+    const finalImage = rawImage.startsWith('data:image/') ? rawImage : normalizeImagePath(rawImage);
 
     const newProduct: Product = {
       id: 'prod-' + Date.now(),
@@ -537,6 +539,7 @@ export const AddProductModal: React.FC<AddProductModalProps> = ({
                         alt={img.label}
                         className="w-full h-14 object-cover rounded-lg"
                         referrerPolicy="no-referrer"
+                        onError={handleImageError}
                       />
                       <span className="block text-[10px] text-stone-700 truncate px-1 py-0.5">
                         {img.label}

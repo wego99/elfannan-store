@@ -2,6 +2,7 @@ import React from 'react';
 import { Star, Eye, ShoppingBag, MessageCircle, Trash2 } from 'lucide-react';
 import { Product } from '../types';
 import { STORE_INFO } from '../data/mockData';
+import { handleImageError, normalizeImagePath } from '../utils/imageUtils';
 
 interface ProductCardProps {
   product: Product;
@@ -32,11 +33,12 @@ export const ProductCard: React.FC<ProductCardProps> = ({
       {/* Product Image Area */}
       <div className="relative aspect-4/3 bg-stone-100 overflow-hidden cursor-pointer" onClick={() => onQuickView(product)}>
         <img
-          src={product.image}
+          src={normalizeImagePath(product.image)}
           alt={product.title}
           className="w-full h-full object-cover group-hover:scale-103 transition-transform duration-500"
           referrerPolicy="no-referrer"
           loading="lazy"
+          onError={handleImageError}
         />
 
         {/* Top Badges */}

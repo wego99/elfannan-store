@@ -1,6 +1,7 @@
 import React from 'react';
 import { Tag, Sparkles, ShoppingBag, ArrowLeft, Percent, Gift } from 'lucide-react';
 import { Product } from '../types';
+import { handleImageError } from '../utils/imageUtils';
 
 interface SpecialOffersProps {
   onQuickView: (product: Product) => void;
@@ -75,10 +76,11 @@ export const SpecialOffers: React.FC<SpecialOffersProps> = ({ onQuickView, offer
             <div className="lg:col-span-5 relative">
               <div className="relative rounded-2xl overflow-hidden border border-white/20 shadow-2xl group">
                 <img
-                  src="/src/assets/images/product_pajama_cotton_pink_1791917783703.jpg"
+                  src="/images/product_pajama_cotton_pink.jpg"
                   alt="عرض التوفير الخاص"
                   className="w-full h-72 sm:h-80 object-cover group-hover:scale-103 transition-transform duration-500"
                   referrerPolicy="no-referrer"
+                  onError={handleImageError}
                 />
                 <div className="absolute top-4 left-4 bg-rose-600 text-white font-extrabold text-xs px-3 py-1.5 rounded-lg shadow-md flex items-center gap-1">
                   <Percent className="w-3.5 h-3.5" />

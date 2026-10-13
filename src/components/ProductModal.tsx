@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { X, Star, ShoppingBag, MessageCircle, ShieldCheck, Check, Truck } from 'lucide-react';
 import { Product } from '../types';
 import { STORE_INFO } from '../data/mockData';
+import { handleImageError, normalizeImagePath } from '../utils/imageUtils';
 
 interface ProductModalProps {
   product: Product | null;
@@ -58,10 +59,11 @@ export const ProductModal: React.FC<ProductModalProps> = ({
         {/* Product Image Column */}
         <div className="w-full md:w-1/2 bg-stone-100 relative min-h-[300px] md:min-h-full">
           <img
-            src={product.image}
+            src={normalizeImagePath(product.image)}
             alt={product.title}
             className="w-full h-full object-cover"
             referrerPolicy="no-referrer"
+            onError={handleImageError}
           />
           <div className="absolute top-4 right-4 bg-stone-900/90 text-white text-xs font-bold px-3 py-1 rounded-md backdrop-blur-xs">
             {product.code}

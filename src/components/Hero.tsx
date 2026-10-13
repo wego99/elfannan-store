@@ -1,6 +1,7 @@
 import React from 'react';
 import { ShoppingBag, MessageCircle, ShieldCheck, Truck, Star, Award, ChevronDown } from 'lucide-react';
 import { STORE_INFO } from '../data/mockData';
+import { handleImageError } from '../utils/imageUtils';
 
 interface HeroProps {
   onExploreCatalog: () => void;
@@ -110,10 +111,11 @@ export const Hero: React.FC<HeroProps> = ({ onExploreCatalog, onExploreReviews }
           <div className="lg:col-span-5 relative flex items-center">
             <div className="relative w-full rounded-2xl overflow-hidden shadow-xl border border-stone-200 bg-stone-100 group">
               <img
-                src="/src/assets/images/hero_loungewear_banner_1791917782855.jpg"
+                src="/images/hero_loungewear_banner.jpg"
                 alt="كولكشن ملابس بيتي مصنع الفنان"
                 className="w-full h-80 sm:h-96 lg:h-[460px] object-cover group-hover:scale-102 transition-transform duration-500"
                 referrerPolicy="no-referrer"
+                onError={handleImageError}
               />
               <div className="absolute inset-0 bg-gradient-to-t from-stone-950/80 via-stone-950/20 to-transparent flex flex-col justify-end p-6 text-white text-right">
                 <div className="space-y-1">

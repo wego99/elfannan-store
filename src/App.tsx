@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Product, Review, CartItem, User } from './types';
 import { INITIAL_PRODUCTS, INITIAL_REVIEWS, STORE_INFO } from './data/mockData';
+import { normalizeImagePath } from './utils/imageUtils';
 import { Navbar } from './components/Navbar';
 import { Hero } from './components/Hero';
 import { ProductCatalog } from './components/ProductCatalog';
@@ -22,7 +23,11 @@ export default function App() {
     try {
       const saved = localStorage.getItem('el_fannan_products');
       if (saved) {
-        return JSON.parse(saved);
+        const parsed: Product[] = JSON.parse(saved);
+        return parsed.map((p) => ({
+          ...p,
+          image: normalizeImagePath(p.image),
+        }));
       }
     } catch (e) {
       console.error(e);
@@ -42,6 +47,26 @@ export default function App() {
     }
     return null;
   });
+
+  // Cart with LocalStorage Persistence
+  const [cartItems, setCartItems] = useState<CartItem[]>(() => {
+    try {
+      const saved = localStorage.getItem('el_fannan_cart');
+      if (saved) {
+        const parsed: CartItem[] = JSON.parse(saved);
+        return parsed.map((item) => ({
+          ...item,
+          product: {
+            ...item.product,
+            image: normalizeImagePath(item.product.image),
+          },
+        }));
+      }
+    } catch (e) {
+      console.error(e);
+    }
+    return [];
+  });
   
   // Reviews with LocalStorage Persistence
   const [reviews, setReviews] = useState<Review[]>(() => {
@@ -54,19 +79,6 @@ export default function App() {
       console.error(e);
     }
     return INITIAL_REVIEWS;
-  });
-
-  // Cart with LocalStorage Persistence
-  const [cartItems, setCartItems] = useState<CartItem[]>(() => {
-    try {
-      const saved = localStorage.getItem('el_fannan_cart');
-      if (saved) {
-        return JSON.parse(saved);
-      }
-    } catch (e) {
-      console.error(e);
-    }
-    return [];
   });
 
   // Applied Wheel / Promo Coupon
@@ -235,7 +247,11 @@ export default function App() {
 
   // Admin Add Product Handler
   const handleAddProduct = (newProd: Product) => {
-    setProducts((prev) => [newProd, ...prev]);
+    const sanitizedProd: Product = {
+      ...newProd,
+      image: normalizeImagePath(newProd.image),
+    };
+    setProducts((prev) => [sanitizedProd, ...prev]);
   };
 
   // Admin Delete Product Handler

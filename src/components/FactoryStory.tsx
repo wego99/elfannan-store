@@ -1,6 +1,7 @@
 import React from 'react';
 import { Store, Users, MapPin, Sparkles, HeartHandshake, Video } from 'lucide-react';
 import { STORE_INFO } from '../data/mockData';
+import { handleImageError } from '../utils/imageUtils';
 
 export const FactoryStory: React.FC = () => {
   return (
@@ -92,10 +93,11 @@ export const FactoryStory: React.FC = () => {
           <div className="lg:col-span-6 relative">
             <div className="rounded-2xl overflow-hidden border border-stone-200 shadow-xl bg-stone-100">
               <img
-                src="/src/assets/images/store_factory_showroom_1791917785162.jpg"
+                src="/images/store_factory_showroom.jpg"
                 alt="معرض وصالة عرض مصنع الفنان للملابس الجاهزة"
                 className="w-full h-80 sm:h-96 object-cover"
                 referrerPolicy="no-referrer"
+                onError={handleImageError}
               />
             </div>
 
