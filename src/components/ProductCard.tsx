@@ -1,5 +1,5 @@
 import React from 'react';
-import { Star, Eye, ShoppingBag, MessageCircle } from 'lucide-react';
+import { Star, Eye, ShoppingBag, MessageCircle, Trash2 } from 'lucide-react';
 import { Product } from '../types';
 import { STORE_INFO } from '../data/mockData';
 
@@ -7,12 +7,16 @@ interface ProductCardProps {
   product: Product;
   onQuickView: (product: Product) => void;
   onAddToCart: (product: Product) => void;
+  isAdmin?: boolean;
+  onDelete?: (id: string) => void;
 }
 
 export const ProductCard: React.FC<ProductCardProps> = ({
   product,
   onQuickView,
   onAddToCart,
+  isAdmin,
+  onDelete,
 }) => {
   const discountPercent = product.originalPrice
     ? Math.round(((product.originalPrice - product.price) / product.originalPrice) * 100)
@@ -36,17 +40,32 @@ export const ProductCard: React.FC<ProductCardProps> = ({
         />
 
         {/* Top Badges */}
-        <div className="absolute top-3 right-3 left-3 flex items-center justify-between pointer-events-none">
-          {product.badge ? (
-            <span className="bg-stone-900/90 text-white text-[11px] font-semibold px-2.5 py-1 rounded-md backdrop-blur-xs">
-              {product.badge}
-            </span>
-          ) : <span />}
+        <div className="absolute top-3 right-3 left-3 flex items-center justify-between">
+          <div className="flex items-center gap-1.5 pointer-events-none">
+            {product.badge && (
+              <span className="bg-stone-900/90 text-white text-[11px] font-semibold px-2.5 py-1 rounded-md backdrop-blur-xs">
+                {product.badge}
+              </span>
+            )}
+            {discountPercent > 0 && (
+              <span className="bg-rose-600 text-white text-[11px] font-bold px-2 py-0.5 rounded-md shadow-xs">
+                خصم {discountPercent}%
+              </span>
+            )}
+          </div>
 
-          {discountPercent > 0 && (
-            <span className="bg-rose-600 text-white text-[11px] font-bold px-2 py-0.5 rounded-md shadow-xs">
-              خصم {discountPercent}%
-            </span>
+          {isAdmin && onDelete && (
+            <button
+              type="button"
+              onClick={(e) => {
+                e.stopPropagation();
+                onDelete(product.id);
+              }}
+              title="حذف الموديل (صلاحية المدير)"
+              className="p-1.5 bg-stone-900/90 hover:bg-rose-800 text-white rounded-lg shadow-sm transition-colors cursor-pointer"
+            >
+              <Trash2 className="w-3.5 h-3.5 text-rose-300 hover:text-white" />
+            </button>
           )}
         </div>
 

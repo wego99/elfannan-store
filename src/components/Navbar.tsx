@@ -1,15 +1,27 @@
 import React, { useState } from 'react';
-import { ShoppingBag, Phone, MessageCircle, Menu, X, Sparkles, MapPin } from 'lucide-react';
+import { ShoppingBag, Phone, MessageCircle, Menu, X, Sparkles, MapPin, User as UserIcon, Plus, Crown } from 'lucide-react';
 import { STORE_INFO } from '../data/mockData';
+import { User } from '../types';
 
 interface NavbarProps {
   cartCount: number;
   onOpenCart: () => void;
   onNavigate: (sectionId: string) => void;
   onOpenWheel?: () => void;
+  currentUser: User | null;
+  onOpenAuth: () => void;
+  onOpenAddProduct?: () => void;
 }
 
-export const Navbar: React.FC<NavbarProps> = ({ cartCount, onOpenCart, onNavigate, onOpenWheel }) => {
+export const Navbar: React.FC<NavbarProps> = ({
+  cartCount,
+  onOpenCart,
+  onNavigate,
+  onOpenWheel,
+  currentUser,
+  onOpenAuth,
+  onOpenAddProduct,
+}) => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   const handleNavClick = (id: string) => {
@@ -122,16 +134,63 @@ export const Navbar: React.FC<NavbarProps> = ({ cartCount, onOpenCart, onNavigat
             </button>
           </nav>
 
-          {/* Zone 3: Primary Action & Cart */}
-          <div className="flex items-center gap-3 shrink-0">
+          {/* Zone 3: Primary Action, User & Cart */}
+          <div className="flex items-center gap-2.5 shrink-0">
+            {/* Admin Exclusive: Compact Add Product Button */}
+            {currentUser?.role === 'admin' && onOpenAddProduct && (
+              <button
+                type="button"
+                onClick={onOpenAddProduct}
+                className="hidden sm:inline-flex items-center gap-1.5 px-3 py-2 text-xs font-bold text-amber-950 bg-gradient-to-r from-amber-100 to-amber-200 hover:from-amber-200 hover:to-amber-300 rounded-lg border border-amber-300/80 transition-all shadow-xs cursor-pointer whitespace-nowrap"
+                title="إضافة موديل جديد للمصنع (خاص بالإدارة)"
+              >
+                <Plus className="w-3.5 h-3.5 text-amber-800" />
+                <span>+ إضافة منتج 👑</span>
+              </button>
+            )}
+
+            {/* User Account / Login Button */}
+            {currentUser ? (
+              <button
+                type="button"
+                onClick={onOpenAuth}
+                className={`px-3 py-2 text-xs font-bold rounded-lg border transition-colors flex items-center gap-1.5 cursor-pointer whitespace-nowrap ${
+                  currentUser.role === 'admin'
+                    ? 'text-rose-950 bg-rose-50 hover:bg-rose-100 border-rose-200'
+                    : 'text-stone-800 bg-stone-100 hover:bg-stone-200 border-stone-200'
+                }`}
+              >
+                {currentUser.role === 'admin' ? (
+                  <>
+                    <Crown className="w-3.5 h-3.5 text-amber-600" />
+                    <span>المدير (admin)</span>
+                  </>
+                ) : (
+                  <>
+                    <UserIcon className="w-3.5 h-3.5 text-stone-600" />
+                    <span className="truncate max-w-[85px]">{currentUser.name}</span>
+                  </>
+                )}
+              </button>
+            ) : (
+              <button
+                type="button"
+                onClick={onOpenAuth}
+                className="px-3 py-2 text-xs font-bold text-stone-700 hover:text-stone-900 bg-stone-50 hover:bg-stone-100 rounded-lg border border-stone-200 transition-colors flex items-center gap-1.5 cursor-pointer whitespace-nowrap"
+              >
+                <UserIcon className="w-3.5 h-3.5 text-stone-500" />
+                <span>دخول / حسابي</span>
+              </button>
+            )}
+
             <a
               href={`https://wa.me/${STORE_INFO.whatsappNumber}?text=${encodeURIComponent('السلام عليكم، أرغب بالاستفسار عن كولكشن مصنع الفنان للملابس البيتي')}`}
               target="_blank"
               rel="noreferrer"
-              className="hidden sm:inline-flex items-center gap-2 px-3.5 py-2 text-xs font-semibold text-emerald-800 bg-emerald-50 hover:bg-emerald-100 rounded-lg border border-emerald-200 transition-colors whitespace-nowrap"
+              className="hidden lg:inline-flex items-center gap-2 px-3 py-2 text-xs font-semibold text-emerald-800 bg-emerald-50 hover:bg-emerald-100 rounded-lg border border-emerald-200 transition-colors whitespace-nowrap"
             >
               <MessageCircle className="w-4 h-4 text-emerald-600" />
-              <span>تواصل واتساب</span>
+              <span>واتساب</span>
             </a>
 
             <button
@@ -205,6 +264,34 @@ export const Navbar: React.FC<NavbarProps> = ({ cartCount, onOpenCart, onNavigat
                 <span>🎡 جرب حظك واربح كوبون هدية فوري</span>
               </button>
             )}
+
+            {/* Account / Admin Trigger in Mobile Menu */}
+            <div className="pt-1 border-t border-stone-100 space-y-1.5">
+              {currentUser?.role === 'admin' && onOpenAddProduct && (
+                <button
+                  onClick={() => {
+                    setMobileMenuOpen(false);
+                    onOpenAddProduct();
+                  }}
+                  className="w-full py-2.5 text-center text-xs font-bold text-amber-950 bg-amber-100 hover:bg-amber-200 border border-amber-300 rounded-lg flex items-center justify-center gap-1.5 cursor-pointer"
+                >
+                  <Plus className="w-4 h-4 text-amber-800" />
+                  <span>+ إضافة موديل جديد (خاص بالمدير) 👑</span>
+                </button>
+              )}
+
+              <button
+                onClick={() => {
+                  setMobileMenuOpen(false);
+                  onOpenAuth();
+                }}
+                className="w-full py-2.5 text-center text-xs font-bold text-stone-800 bg-stone-100 hover:bg-stone-200 rounded-lg flex items-center justify-center gap-1.5 cursor-pointer"
+              >
+                <UserIcon className="w-4 h-4 text-stone-600" />
+                <span>{currentUser ? `حساب: ${currentUser.name}` : 'تسجيل الدخول / إنشاء حساب'}</span>
+              </button>
+            </div>
+
             <div className="pt-2 border-t border-stone-100 flex flex-col gap-2">
               <a
                 href={`https://wa.me/${STORE_INFO.whatsappNumber}`}

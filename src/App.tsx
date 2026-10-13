@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Product, Review, CartItem } from './types';
+import { Product, Review, CartItem, User } from './types';
 import { INITIAL_PRODUCTS, INITIAL_REVIEWS, STORE_INFO } from './data/mockData';
 import { Navbar } from './components/Navbar';
 import { Hero } from './components/Hero';
@@ -13,9 +13,35 @@ import { CartDrawer } from './components/CartDrawer';
 import { Footer } from './components/Footer';
 import { LuckyWheelModal, WheelPrize, WHEEL_PRIZES } from './components/LuckyWheelModal';
 import { FloatingWheelTrigger } from './components/FloatingWheelTrigger';
+import { AuthModal } from './components/AuthModal';
+import { AddProductModal } from './components/AddProductModal';
 
 export default function App() {
-  const [products] = useState<Product[]>(INITIAL_PRODUCTS);
+  // Products with LocalStorage Persistence
+  const [products, setProducts] = useState<Product[]>(() => {
+    try {
+      const saved = localStorage.getItem('el_fannan_products');
+      if (saved) {
+        return JSON.parse(saved);
+      }
+    } catch (e) {
+      console.error(e);
+    }
+    return INITIAL_PRODUCTS;
+  });
+
+  // Current logged in user (admin or customer)
+  const [currentUser, setCurrentUser] = useState<User | null>(() => {
+    try {
+      const saved = localStorage.getItem('el_fannan_current_user');
+      if (saved) {
+        return JSON.parse(saved);
+      }
+    } catch (e) {
+      console.error(e);
+    }
+    return null;
+  });
   
   // Reviews with LocalStorage Persistence
   const [reviews, setReviews] = useState<Review[]>(() => {
@@ -60,6 +86,30 @@ export default function App() {
   const [quickViewProduct, setQuickViewProduct] = useState<Product | null>(null);
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [isWheelOpen, setIsWheelOpen] = useState(false);
+  const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
+  const [isAddProductModalOpen, setIsAddProductModalOpen] = useState(false);
+
+  // Sync products to LocalStorage
+  useEffect(() => {
+    try {
+      localStorage.setItem('el_fannan_products', JSON.stringify(products));
+    } catch (e) {
+      console.error(e);
+    }
+  }, [products]);
+
+  // Sync current user to LocalStorage
+  useEffect(() => {
+    try {
+      if (currentUser) {
+        localStorage.setItem('el_fannan_current_user', JSON.stringify(currentUser));
+      } else {
+        localStorage.removeItem('el_fannan_current_user');
+      }
+    } catch (e) {
+      console.error(e);
+    }
+  }, [currentUser]);
 
   // Sync reviews to LocalStorage
   useEffect(() => {
@@ -174,6 +224,25 @@ export default function App() {
     return false;
   };
 
+  // Auth Handlers
+  const handleLoginSuccess = (user: User) => {
+    setCurrentUser(user);
+  };
+
+  const handleLogout = () => {
+    setCurrentUser(null);
+  };
+
+  // Admin Add Product Handler
+  const handleAddProduct = (newProd: Product) => {
+    setProducts((prev) => [newProd, ...prev]);
+  };
+
+  // Admin Delete Product Handler
+  const handleDeleteProduct = (productId: string) => {
+    setProducts((prev) => prev.filter((p) => p.id !== productId));
+  };
+
   // Add new customer review
   const handleAddReview = (
     newRev: Omit<Review, 'id' | 'date' | 'likes' | 'verified'>
@@ -213,16 +282,19 @@ export default function App() {
     }
   };
 
-  const comboOfferProduct = products.find((p) => p.id === 'prod-offer-1');
+  const comboOfferProduct = products.find((p) => p.id === 'prod-offer-1') || products[0];
 
   return (
     <div className="min-h-screen flex flex-col bg-[#FAF8F5] text-stone-900 font-['Cairo',sans-serif]">
-      {/* Top Navbar with Wheel Quick Trigger */}
+      {/* Top Navbar with Account, Admin triggers, and Wheel Quick Trigger */}
       <Navbar
         cartCount={totalCartCount}
         onOpenCart={() => setIsCartOpen(true)}
         onNavigate={handleNavigate}
         onOpenWheel={() => setIsWheelOpen(true)}
+        currentUser={currentUser}
+        onOpenAuth={() => setIsAuthModalOpen(true)}
+        onOpenAddProduct={() => setIsAddProductModalOpen(true)}
       />
 
       {/* Main Content Areas */}
@@ -239,11 +311,14 @@ export default function App() {
           offerProduct={comboOfferProduct}
         />
 
-        {/* Product Catalog */}
+        {/* Product Catalog with Admin controls */}
         <ProductCatalog
           products={products}
           onQuickView={(p) => setQuickViewProduct(p)}
           onAddToCart={handleAddToCart}
+          isAdmin={currentUser?.role === 'admin'}
+          onOpenAddProduct={() => setIsAddProductModalOpen(true)}
+          onDeleteProduct={handleDeleteProduct}
         />
 
         {/* Authentic Customer Reviews Section */}
@@ -294,6 +369,22 @@ export default function App() {
         appliedCoupon={appliedCoupon}
         onRemoveCoupon={handleRemoveCoupon}
         onApplyPromoCode={handleApplyPromoCode}
+      />
+
+      {/* Authentication Modal (Login / Register / Pre-configured admin) */}
+      <AuthModal
+        isOpen={isAuthModalOpen}
+        onClose={() => setIsAuthModalOpen(false)}
+        onLoginSuccess={handleLoginSuccess}
+        onLogout={handleLogout}
+        currentUser={currentUser}
+      />
+
+      {/* Admin Add Product Modal with Dedicated Discount Buttons */}
+      <AddProductModal
+        isOpen={isAddProductModalOpen && currentUser?.role === 'admin'}
+        onClose={() => setIsAddProductModalOpen(false)}
+        onAddProduct={handleAddProduct}
       />
     </div>
   );

@@ -1,5 +1,5 @@
 import React, { useState, useMemo } from 'react';
-import { Search, SlidersHorizontal, Sparkles } from 'lucide-react';
+import { Search, SlidersHorizontal, Sparkles, Plus, ShieldCheck } from 'lucide-react';
 import { Product } from '../types';
 import { ProductCard } from './ProductCard';
 
@@ -7,6 +7,9 @@ interface ProductCatalogProps {
   products: Product[];
   onQuickView: (product: Product) => void;
   onAddToCart: (product: Product) => void;
+  isAdmin?: boolean;
+  onOpenAddProduct?: () => void;
+  onDeleteProduct?: (id: string) => void;
 }
 
 type CategoryFilter = 'all' | 'winter' | 'turkish' | 'cotton' | 'velvet' | 'offers';
@@ -15,6 +18,9 @@ export const ProductCatalog: React.FC<ProductCatalogProps> = ({
   products,
   onQuickView,
   onAddToCart,
+  isAdmin,
+  onOpenAddProduct,
+  onDeleteProduct,
 }) => {
   const [activeCategory, setActiveCategory] = useState<CategoryFilter>('all');
   const [searchQuery, setSearchQuery] = useState('');
@@ -56,20 +62,36 @@ export const ProductCatalog: React.FC<ProductCatalogProps> = ({
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         
         {/* Section Header */}
-        <div className="text-right space-y-2 mb-8">
-          <div className="flex items-center gap-2 text-xs font-semibold text-rose-900">
-            <span>تشكيلة الموسم الحالية</span>
-            <span aria-hidden="true" className="text-stone-300">·</span>
-            <span>أسعار الجملة للقطاعي</span>
-            <span aria-hidden="true" className="text-stone-300">·</span>
-            <span className="text-stone-500">{products.length} موديل متوفر</span>
+        <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-8 text-right">
+          <div className="space-y-1.5">
+            <div className="flex items-center gap-2 text-xs font-semibold text-rose-900">
+              <span>تشكيلة الموسم الحالية</span>
+              <span aria-hidden="true" className="text-stone-300">·</span>
+              <span>أسعار الجملة للقطاعي</span>
+              <span aria-hidden="true" className="text-stone-300">·</span>
+              <span className="text-stone-500">{products.length} موديل متوفر</span>
+            </div>
+            <h2 className="text-2xl sm:text-3xl font-extrabold text-stone-900">
+              كتالوج موديلات مصنع وسنتر الفنان
+            </h2>
+            <p className="text-sm text-stone-600 max-w-2xl">
+              بيجامات شتوي وصيفي وهوم وير بأعلى تقفيل وخامات مستوردة، متوفر بجميع المقاسات والألوان مع كود الموديل لسهولة الطلب.
+            </p>
           </div>
-          <h2 className="text-2xl sm:text-3xl font-extrabold text-stone-900">
-            كتالوج موديلات مصنع وسنتر الفنان
-          </h2>
-          <p className="text-sm text-stone-600 max-w-2xl">
-            بيجامات شتوي وصيفي وهوم وير بأعلى تقفيل وخامات مستوردة، متوفر بجميع المقاسات والألوان مع كود الموديل لسهولة الطلب.
-          </p>
+
+          {/* Compact Admin Add Product Button (Only visible for admin account!) */}
+          {isAdmin && onOpenAddProduct && (
+            <div className="shrink-0 flex items-center gap-2">
+              <button
+                type="button"
+                onClick={onOpenAddProduct}
+                className="inline-flex items-center gap-2 px-4 py-2.5 bg-gradient-to-r from-rose-950 to-stone-900 hover:from-rose-900 hover:to-stone-800 text-white rounded-xl text-xs font-bold shadow-md transition-all cursor-pointer border border-amber-500/30 hover:scale-102"
+              >
+                <Plus className="w-4 h-4 text-amber-400" />
+                <span>إضافة موديل جديد للمصنع 👑</span>
+              </button>
+            </div>
+          )}
         </div>
 
         {/* Filter Controls & Search Bar */}
@@ -146,6 +168,8 @@ export const ProductCatalog: React.FC<ProductCatalogProps> = ({
                 product={product}
                 onQuickView={onQuickView}
                 onAddToCart={onAddToCart}
+                isAdmin={isAdmin}
+                onDelete={onDeleteProduct}
               />
             ))}
           </div>

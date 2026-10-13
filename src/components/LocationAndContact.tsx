@@ -40,7 +40,7 @@ export const LocationAndContact: React.FC = () => {
                   {STORE_INFO.address}
                 </h3>
                 <p className="text-xs text-stone-500">
-                  ميدان المجمع، خلف حلواني أبو عطوة، بجوار صيدلية د. نبيل أسامة.
+                  ميدان المجمع، خلف حلواني أبو عطوة، بجوار صيدلية د. جبر.
                 </p>
               </div>
             </div>
