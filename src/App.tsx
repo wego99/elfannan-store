@@ -1,0 +1,300 @@
+import React, { useState, useEffect } from 'react';
+import { Product, Review, CartItem } from './types';
+import { INITIAL_PRODUCTS, INITIAL_REVIEWS, STORE_INFO } from './data/mockData';
+import { Navbar } from './components/Navbar';
+import { Hero } from './components/Hero';
+import { ProductCatalog } from './components/ProductCatalog';
+import { ProductModal } from './components/ProductModal';
+import { ReviewsSection } from './components/ReviewsSection';
+import { FactoryStory } from './components/FactoryStory';
+import { SpecialOffers } from './components/SpecialOffers';
+import { LocationAndContact } from './components/LocationAndContact';
+import { CartDrawer } from './components/CartDrawer';
+import { Footer } from './components/Footer';
+import { LuckyWheelModal, WheelPrize, WHEEL_PRIZES } from './components/LuckyWheelModal';
+import { FloatingWheelTrigger } from './components/FloatingWheelTrigger';
+
+export default function App() {
+  const [products] = useState<Product[]>(INITIAL_PRODUCTS);
+  
+  // Reviews with LocalStorage Persistence
+  const [reviews, setReviews] = useState<Review[]>(() => {
+    try {
+      const saved = localStorage.getItem('el_fannan_reviews');
+      if (saved) {
+        return JSON.parse(saved);
+      }
+    } catch (e) {
+      console.error(e);
+    }
+    return INITIAL_REVIEWS;
+  });
+
+  // Cart with LocalStorage Persistence
+  const [cartItems, setCartItems] = useState<CartItem[]>(() => {
+    try {
+      const saved = localStorage.getItem('el_fannan_cart');
+      if (saved) {
+        return JSON.parse(saved);
+      }
+    } catch (e) {
+      console.error(e);
+    }
+    return [];
+  });
+
+  // Applied Wheel / Promo Coupon
+  const [appliedCoupon, setAppliedCoupon] = useState<WheelPrize | null>(() => {
+    try {
+      const saved = localStorage.getItem('el_fannan_won_coupon');
+      if (saved) {
+        return JSON.parse(saved);
+      }
+    } catch (e) {
+      console.error(e);
+    }
+    return null;
+  });
+
+  // Modals & Drawers
+  const [quickViewProduct, setQuickViewProduct] = useState<Product | null>(null);
+  const [isCartOpen, setIsCartOpen] = useState(false);
+  const [isWheelOpen, setIsWheelOpen] = useState(false);
+
+  // Sync reviews to LocalStorage
+  useEffect(() => {
+    try {
+      localStorage.setItem('el_fannan_reviews', JSON.stringify(reviews));
+    } catch (e) {
+      console.error(e);
+    }
+  }, [reviews]);
+
+  // Sync cart to LocalStorage
+  useEffect(() => {
+    try {
+      localStorage.setItem('el_fannan_cart', JSON.stringify(cartItems));
+    } catch (e) {
+      console.error(e);
+    }
+  }, [cartItems]);
+
+  // Sync applied coupon to LocalStorage
+  useEffect(() => {
+    try {
+      if (appliedCoupon) {
+        localStorage.setItem('el_fannan_won_coupon', JSON.stringify(appliedCoupon));
+      } else {
+        localStorage.removeItem('el_fannan_won_coupon');
+      }
+    } catch (e) {
+      console.error(e);
+    }
+  }, [appliedCoupon]);
+
+  // Total items in cart
+  const totalCartCount = cartItems.reduce((acc, item) => acc + item.quantity, 0);
+
+  // Add to cart default
+  const handleAddToCart = (product: Product) => {
+    const defaultSize = product.sizes[0] || 'L';
+    const defaultColor = product.colors[0]?.name || 'الافتراضي';
+    handleAddToCartWithOptions(product, defaultSize, defaultColor, 1);
+  };
+
+  // Add to cart with custom size, color, quantity
+  const handleAddToCartWithOptions = (
+    product: Product,
+    selectedSize: string,
+    selectedColor: string,
+    quantity: number
+  ) => {
+    const itemId = `${product.id}-${selectedSize}-${selectedColor}`;
+    
+    setCartItems((prev) => {
+      const existing = prev.find((item) => item.id === itemId);
+      if (existing) {
+        return prev.map((item) =>
+          item.id === itemId
+            ? { ...item, quantity: item.quantity + quantity }
+            : item
+        );
+      }
+      return [
+        ...prev,
+        {
+          id: itemId,
+          product,
+          quantity,
+          selectedSize,
+          selectedColor,
+        },
+      ];
+    });
+
+    setIsCartOpen(true);
+  };
+
+  const handleUpdateQuantity = (id: string, quantity: number) => {
+    if (quantity <= 0) {
+      handleRemoveItem(id);
+      return;
+    }
+    setCartItems((prev) =>
+      prev.map((item) => (item.id === id ? { ...item, quantity } : item))
+    );
+  };
+
+  const handleRemoveItem = (id: string) => {
+    setCartItems((prev) => prev.filter((item) => item.id !== id));
+  };
+
+  const handleClearCart = () => {
+    setCartItems([]);
+  };
+
+  // Coupon handlers
+  const handleApplyPrizeToCart = (prize: WheelPrize) => {
+    setAppliedCoupon(prize);
+    setIsCartOpen(true);
+  };
+
+  const handleRemoveCoupon = () => {
+    setAppliedCoupon(null);
+  };
+
+  const handleApplyPromoCode = (code: string): boolean => {
+    const found = WHEEL_PRIZES.find(
+      (p) => p.code.toLowerCase() === code.trim().toLowerCase()
+    );
+    if (found) {
+      setAppliedCoupon(found);
+      return true;
+    }
+    return false;
+  };
+
+  // Add new customer review
+  const handleAddReview = (
+    newRev: Omit<Review, 'id' | 'date' | 'likes' | 'verified'>
+  ) => {
+    const createdReview: Review = {
+      ...newRev,
+      id: 'rev-' + Date.now(),
+      date: 'الآن',
+      likes: 1,
+      verified: true,
+    };
+    setReviews((prev) => [createdReview, ...prev]);
+  };
+
+  // Like review handler
+  const handleLikeReview = (reviewId: string) => {
+    setReviews((prev) =>
+      prev.map((r) => {
+        if (r.id === reviewId) {
+          const hasLiked = !!r.hasLiked;
+          return {
+            ...r,
+            hasLiked: !hasLiked,
+            likes: hasLiked ? r.likes - 1 : r.likes + 1,
+          };
+        }
+        return r;
+      })
+    );
+  };
+
+  // Navigation scroll helper
+  const handleNavigate = (sectionId: string) => {
+    const el = document.getElementById(sectionId);
+    if (el) {
+      el.scrollIntoView({ behavior: 'smooth' });
+    }
+  };
+
+  const comboOfferProduct = products.find((p) => p.id === 'prod-offer-1');
+
+  return (
+    <div className="min-h-screen flex flex-col bg-[#FAF8F5] text-stone-900 font-['Cairo',sans-serif]">
+      {/* Top Navbar with Wheel Quick Trigger */}
+      <Navbar
+        cartCount={totalCartCount}
+        onOpenCart={() => setIsCartOpen(true)}
+        onNavigate={handleNavigate}
+        onOpenWheel={() => setIsWheelOpen(true)}
+      />
+
+      {/* Main Content Areas */}
+      <main className="flex-1">
+        {/* Hero Section */}
+        <Hero
+          onExploreCatalog={() => handleNavigate('catalog')}
+          onExploreReviews={() => handleNavigate('reviews')}
+        />
+
+        {/* Special Offers Banner */}
+        <SpecialOffers
+          onQuickView={(p) => setQuickViewProduct(p)}
+          offerProduct={comboOfferProduct}
+        />
+
+        {/* Product Catalog */}
+        <ProductCatalog
+          products={products}
+          onQuickView={(p) => setQuickViewProduct(p)}
+          onAddToCart={handleAddToCart}
+        />
+
+        {/* Authentic Customer Reviews Section */}
+        <ReviewsSection
+          reviews={reviews}
+          onAddReview={handleAddReview}
+          onLikeReview={handleLikeReview}
+        />
+
+        {/* Factory Story & Showroom */}
+        <FactoryStory />
+
+        {/* Location & Contact Information */}
+        <LocationAndContact />
+      </main>
+
+      {/* Footer */}
+      <Footer onNavigate={handleNavigate} />
+
+      {/* Floating Lucky Wheel Trigger Button */}
+      <FloatingWheelTrigger
+        onOpenWheel={() => setIsWheelOpen(true)}
+        hasWonDiscount={!!appliedCoupon}
+      />
+
+      {/* Lucky Wheel Modal */}
+      <LuckyWheelModal
+        isOpen={isWheelOpen}
+        onClose={() => setIsWheelOpen(false)}
+        onApplyPrizeToCart={handleApplyPrizeToCart}
+      />
+
+      {/* Quick View Product Modal */}
+      <ProductModal
+        product={quickViewProduct}
+        onClose={() => setQuickViewProduct(null)}
+        onAddToCartWithOptions={handleAddToCartWithOptions}
+      />
+
+      {/* Slide-over Shopping Cart Drawer with Promo & Coupon Support */}
+      <CartDrawer
+        isOpen={isCartOpen}
+        onClose={() => setIsCartOpen(false)}
+        cartItems={cartItems}
+        onUpdateQuantity={handleUpdateQuantity}
+        onRemoveItem={handleRemoveItem}
+        onClearCart={handleClearCart}
+        appliedCoupon={appliedCoupon}
+        onRemoveCoupon={handleRemoveCoupon}
+        onApplyPromoCode={handleApplyPromoCode}
+      />
+    </div>
+  );
+}
