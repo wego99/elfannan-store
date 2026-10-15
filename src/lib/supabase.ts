@@ -219,6 +219,49 @@ export async function deleteProductFromSupabase(
 }
 
 /**
+ * Update an existing product in Supabase 'products' table by ID.
+ */
+export async function updateProductInSupabase(
+  id: string | number,
+  updates: {
+    title?: string;
+    price?: number;
+    image?: string;
+  }
+): Promise<{
+  data: SupabaseProductRow | null;
+  error: any;
+  rlsError: boolean;
+}> {
+  try {
+    const numericId = Number(id);
+    const target = isNaN(numericId) ? id : numericId;
+
+    const payload: Record<string, any> = {};
+    if (updates.title !== undefined) payload.title = updates.title.trim();
+    if (updates.price !== undefined) payload.price = Number(updates.price);
+    if (updates.image !== undefined) payload.image = updates.image;
+
+    const { data, error } = await supabase
+      .from('products')
+      .update(payload)
+      .eq('id', target)
+      .select();
+
+    if (error) {
+      const isRls =
+        error.code === '42501' ||
+        (typeof error.message === 'string' && error.message.includes('row-level security'));
+      return { data: null, error, rlsError: isRls };
+    }
+
+    return { data: data?.[0] || null, error: null, rlsError: false };
+  } catch (err: any) {
+    return { data: null, error: err, rlsError: false };
+  }
+}
+
+/**
  * Bulk seed initial products into Supabase 'products' table.
  */
 export async function seedProductsToSupabase(

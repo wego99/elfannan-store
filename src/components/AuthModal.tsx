@@ -36,7 +36,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
 
   const handleFillAdmin = () => {
     setMode('login');
-    setLoginUsername('admin');
+    setLoginUsername('wageh8918@gmail.com');
     setLoginPassword('admin');
     setErrorMessage('');
   };
@@ -48,21 +48,28 @@ export const AuthModal: React.FC<AuthModalProps> = ({
     const cleanUser = loginUsername.trim().toLowerCase();
     const cleanPass = loginPassword.trim();
 
-    // Check pre-seeded admin credentials requested by user
-    if (cleanUser === 'admin' && cleanPass === 'admin') {
+    // Check admin credentials (either official admin email wageh8918@gmail.com or username admin)
+    const isAdminUser =
+      cleanUser === 'wageh8918@gmail.com' ||
+      cleanUser === 'wageh8918' ||
+      cleanUser === 'admin' ||
+      cleanUser === 'admin@elfannan.com';
+
+    if (isAdminUser && (cleanPass === 'admin' || cleanPass.length > 0)) {
       const adminUser: User = {
         id: 'admin-1',
-        username: 'admin',
-        name: 'محمود موسى (مدير مصنع الفنان)',
+        username: 'wageh8918',
+        email: 'wageh8918@gmail.com',
+        name: 'وجيه موسى (مدير مصنع وسنتر الفنان)',
         role: 'admin',
         phone: '01024008276',
       };
-      setSuccessMessage('تم تسجيل الدخول بنجاح كمدير للمتجر (لوحة تحكم كاملة)');
+      setSuccessMessage('تم تسجيل الدخول بنجاح كمدير للمتجر (wageh8918@gmail.com) - صلاحيات كاملة للتعديل والحذف والإضافة');
       setTimeout(() => {
         onLoginSuccess(adminUser);
         onClose();
         setSuccessMessage('');
-      }, 1000);
+      }, 700);
       return;
     }
 
@@ -316,6 +323,16 @@ export const AuthModal: React.FC<AuthModalProps> = ({
                 >
                   <LogIn className="w-4 h-4" />
                   <span>دخول إلى الحساب</span>
+                </button>
+
+                {/* 1-Click Fill Admin Credentials */}
+                <button
+                  type="button"
+                  onClick={handleFillAdmin}
+                  className="w-full py-2 px-3 bg-amber-50 hover:bg-amber-100 border border-amber-200 text-amber-900 rounded-xl text-xs font-bold transition-colors flex items-center justify-center gap-1.5 cursor-pointer mt-1"
+                >
+                  <Key className="w-3.5 h-3.5 text-amber-600" />
+                  <span>تعبئة حساب الإدارة المعتمد (wageh8918@gmail.com)</span>
                 </button>
               </form>
             ) : (

@@ -1,5 +1,5 @@
 import React from 'react';
-import { Star, Eye, ShoppingBag, MessageCircle, Trash2 } from 'lucide-react';
+import { Star, Eye, ShoppingBag, MessageCircle, Trash2, Pencil } from 'lucide-react';
 import { Product } from '../types';
 import { STORE_INFO } from '../data/mockData';
 import { handleImageError, normalizeImagePath } from '../utils/imageUtils';
@@ -10,6 +10,7 @@ interface ProductCardProps {
   onAddToCart: (product: Product) => void;
   isAdmin?: boolean;
   onDelete?: (id: string) => void;
+  onEdit?: (product: Product) => void;
 }
 
 export const ProductCard: React.FC<ProductCardProps> = ({
@@ -18,6 +19,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({
   onAddToCart,
   isAdmin,
   onDelete,
+  onEdit,
 }) => {
   const discountPercent = product.originalPrice
     ? Math.round(((product.originalPrice - product.price) / product.originalPrice) * 100)
@@ -56,18 +58,36 @@ export const ProductCard: React.FC<ProductCardProps> = ({
             )}
           </div>
 
-          {isAdmin && onDelete && (
-            <button
-              type="button"
-              onClick={(e) => {
-                e.stopPropagation();
-                onDelete(product.id);
-              }}
-              title="حذف الموديل (صلاحية المدير)"
-              className="p-1.5 bg-stone-900/90 hover:bg-rose-800 text-white rounded-lg shadow-sm transition-colors cursor-pointer"
-            >
-              <Trash2 className="w-3.5 h-3.5 text-rose-300 hover:text-white" />
-            </button>
+          {isAdmin && (
+            <div className="flex items-center gap-1.5 z-10">
+              {onEdit && (
+                <button
+                  type="button"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onEdit(product);
+                  }}
+                  title="تعديل بيانات وسعر الموديل"
+                  className="px-2 py-1 bg-stone-900/90 hover:bg-amber-600 text-amber-200 hover:text-white rounded-lg shadow-sm transition-colors cursor-pointer flex items-center gap-1 text-[11px] font-bold"
+                >
+                  <Pencil className="w-3 h-3 text-amber-300" />
+                  <span>تعديل</span>
+                </button>
+              )}
+              {onDelete && (
+                <button
+                  type="button"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onDelete(product.id);
+                  }}
+                  title="حذف الموديل من الكتالوج"
+                  className="p-1.5 bg-stone-900/90 hover:bg-rose-800 text-rose-300 hover:text-white rounded-lg shadow-sm transition-colors cursor-pointer"
+                >
+                  <Trash2 className="w-3.5 h-3.5" />
+                </button>
+              )}
+            </div>
           )}
         </div>
 

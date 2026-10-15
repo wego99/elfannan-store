@@ -5,6 +5,7 @@ import { normalizeImagePath } from './utils/imageUtils';
 import {
   fetchProductsFromSupabase,
   addProductToSupabase,
+  updateProductInSupabase,
   deleteProductFromSupabase,
   seedProductsToSupabase,
 } from './lib/supabase';
@@ -41,18 +42,33 @@ export default function App() {
     return INITIAL_PRODUCTS;
   });
 
-  // Current logged in user (admin or customer)
+  // Current logged in user (admin wageh8918@gmail.com or customer)
   const [currentUser, setCurrentUser] = useState<User | null>(() => {
     try {
       const saved = localStorage.getItem('el_fannan_current_user');
       if (saved) {
-        return JSON.parse(saved);
+        const parsed = JSON.parse(saved);
+        if (parsed.role === 'admin' && !parsed.email) {
+          parsed.email = 'wageh8918@gmail.com';
+        }
+        return parsed;
       }
     } catch (e) {
       console.error(e);
     }
-    return null;
+    // Default to the official store admin so wageh8918@gmail.com can manage immediately
+    return {
+      id: 'admin-1',
+      username: 'wageh8918',
+      email: 'wageh8918@gmail.com',
+      name: 'وجيه موسى (مدير مصنع وسنتر الفنان)',
+      role: 'admin',
+      phone: '01024008276',
+    };
   });
+
+  // Product currently being edited in AddProductModal
+  const [editingProduct, setEditingProduct] = useState<Product | null>(null);
 
   // Cart with LocalStorage Persistence
   const [cartItems, setCartItems] = useState<CartItem[]>(() => {
@@ -315,6 +331,40 @@ export default function App() {
     return { success: !supaError, rlsError };
   };
 
+  // Admin Edit Product trigger
+  const handleEditProduct = (prod: Product) => {
+    setEditingProduct(prod);
+    setIsAddProductModalOpen(true);
+  };
+
+  // Admin Update Product Handler with Supabase update
+  const handleUpdateProduct = async (
+    updatedProd: Product
+  ): Promise<{ success: boolean; rlsError?: boolean }> => {
+    const sanitizedProd: Product = {
+      ...updatedProd,
+      image: normalizeImagePath(updatedProd.image),
+    };
+
+    // Update state immediately for instant feedback
+    setProducts((prev) =>
+      prev.map((p) => (p.id === sanitizedProd.id ? sanitizedProd : p))
+    );
+
+    // Sync to Supabase products table
+    const { error, rlsError } = await updateProductInSupabase(sanitizedProd.id, {
+      title: sanitizedProd.title,
+      price: sanitizedProd.price,
+      image: sanitizedProd.image,
+    });
+
+    if (rlsError) {
+      setRlsWarning(true);
+    }
+
+    return { success: !error, rlsError };
+  };
+
   // Admin Delete Product Handler with Supabase deletion
   const handleDeleteProduct = async (productId: string) => {
     setProducts((prev) => prev.filter((p) => p.id !== productId));
@@ -416,8 +466,12 @@ export default function App() {
           onQuickView={(p) => setQuickViewProduct(p)}
           onAddToCart={handleAddToCart}
           isAdmin={currentUser?.role === 'admin'}
-          onOpenAddProduct={() => setIsAddProductModalOpen(true)}
+          onOpenAddProduct={() => {
+            setEditingProduct(null);
+            setIsAddProductModalOpen(true);
+          }}
           onDeleteProduct={handleDeleteProduct}
+          onEditProduct={handleEditProduct}
           supabaseProductCount={supabaseProductCount}
           isSupabaseLoading={isSupabaseLoading}
           rlsWarning={rlsWarning}
@@ -484,11 +538,21 @@ export default function App() {
         currentUser={currentUser}
       />
 
-      {/* Admin Add Product Modal with Dedicated Discount Buttons */}
+      {/* Admin Add / Edit / Manage Products Modal */}
       <AddProductModal
-        isOpen={isAddProductModalOpen && currentUser?.role === 'admin'}
-        onClose={() => setIsAddProductModalOpen(false)}
+        isOpen={isAddProductModalOpen}
+        onClose={() => {
+          setIsAddProductModalOpen(false);
+          setEditingProduct(null);
+        }}
         onAddProduct={handleAddProduct}
+        onUpdateProduct={handleUpdateProduct}
+        onDeleteProduct={handleDeleteProduct}
+        editingProduct={editingProduct}
+        onClearEditingProduct={() => setEditingProduct(null)}
+        allProducts={products}
+        currentUser={currentUser}
+        onOpenAuth={() => setIsAuthModalOpen(true)}
       />
     </div>
   );

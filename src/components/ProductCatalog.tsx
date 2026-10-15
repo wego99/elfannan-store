@@ -11,6 +11,7 @@ interface ProductCatalogProps {
   isAdmin?: boolean;
   onOpenAddProduct?: () => void;
   onDeleteProduct?: (id: string) => void;
+  onEditProduct?: (product: Product) => void;
   supabaseProductCount?: number;
   isSupabaseLoading?: boolean;
   rlsWarning?: boolean;
@@ -27,6 +28,7 @@ export const ProductCatalog: React.FC<ProductCatalogProps> = ({
   isAdmin,
   onOpenAddProduct,
   onDeleteProduct,
+  onEditProduct,
   supabaseProductCount = 0,
   isSupabaseLoading = false,
   rlsWarning = false,
@@ -182,9 +184,9 @@ export const ProductCatalog: React.FC<ProductCatalogProps> = ({
 
         </div>
 
-        {/* Product Grid */}
+        {/* Product Grid - Fully responsive across mobile, tablet, desktop, and large displays */}
         {filteredProducts.length > 0 ? (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5 sm:gap-6">
             {filteredProducts.map((product) => (
               <ProductCard
                 key={product.id}
@@ -193,6 +195,7 @@ export const ProductCatalog: React.FC<ProductCatalogProps> = ({
                 onAddToCart={onAddToCart}
                 isAdmin={isAdmin}
                 onDelete={onDeleteProduct}
+                onEdit={onEditProduct}
               />
             ))}
           </div>

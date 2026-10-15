@@ -136,16 +136,16 @@ export const Navbar: React.FC<NavbarProps> = ({
 
           {/* Zone 3: Primary Action, User & Cart */}
           <div className="flex items-center gap-2.5 shrink-0">
-            {/* Admin Exclusive: Compact Add Product Button */}
+            {/* Admin Exclusive: Compact Add & Manage Products Button */}
             {currentUser?.role === 'admin' && onOpenAddProduct && (
               <button
                 type="button"
                 onClick={onOpenAddProduct}
                 className="hidden sm:inline-flex items-center gap-1.5 px-3 py-2 text-xs font-bold text-amber-950 bg-gradient-to-r from-amber-100 to-amber-200 hover:from-amber-200 hover:to-amber-300 rounded-lg border border-amber-300/80 transition-all shadow-xs cursor-pointer whitespace-nowrap"
-                title="إضافة موديل جديد للمصنع (خاص بالإدارة)"
+                title="إضافة وتعديل وحذف الموديلات (خاص بالإدارة)"
               >
                 <Plus className="w-3.5 h-3.5 text-amber-800" />
-                <span>+ إضافة منتج 👑</span>
+                <span>+ إضافة وإدارة الموديلات 👑</span>
               </button>
             )}
 
@@ -163,7 +163,9 @@ export const Navbar: React.FC<NavbarProps> = ({
                 {currentUser.role === 'admin' ? (
                   <>
                     <Crown className="w-3.5 h-3.5 text-amber-600" />
-                    <span>المدير (admin)</span>
+                    <span className="truncate max-w-[120px]">
+                      {currentUser.name.includes('وجيه') ? 'المدير: وجيه' : 'حساب المدير'}
+                    </span>
                   </>
                 ) : (
                   <>
@@ -276,7 +278,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                   className="w-full py-2.5 text-center text-xs font-bold text-amber-950 bg-amber-100 hover:bg-amber-200 border border-amber-300 rounded-lg flex items-center justify-center gap-1.5 cursor-pointer"
                 >
                   <Plus className="w-4 h-4 text-amber-800" />
-                  <span>+ إضافة موديل جديد (خاص بالمدير) 👑</span>
+                  <span>+ إضافة وتعديل وإدارة الموديلات 👑</span>
                 </button>
               )}
 

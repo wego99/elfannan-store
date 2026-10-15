@@ -43,10 +43,10 @@ export const Hero: React.FC<HeroProps> = ({ onExploreCatalog, onExploreReviews }
             </p>
 
             {/* Key Action Buttons */}
-            <div className="flex flex-wrap items-center gap-3 pt-2">
+            <div className="flex flex-col sm:flex-row flex-wrap items-stretch sm:items-center gap-3 pt-2">
               <button
                 onClick={onExploreCatalog}
-                className="px-6 py-3.5 text-sm font-bold text-white bg-rose-950 hover:bg-rose-900 rounded-xl shadow-md transition-all flex items-center gap-2 cursor-pointer"
+                className="w-full sm:w-auto px-6 py-3.5 text-sm font-bold text-white bg-rose-950 hover:bg-rose-900 rounded-xl shadow-md transition-all flex items-center justify-center gap-2 cursor-pointer"
               >
                 <ShoppingBag className="w-4 h-4" />
                 <span>تصفح كولكشن الشتاء والبيتي</span>
@@ -57,7 +57,7 @@ export const Hero: React.FC<HeroProps> = ({ onExploreCatalog, onExploreReviews }
                 href={`https://wa.me/${STORE_INFO.whatsappNumber}?text=${encodeURIComponent('السلام عليكم، شفت موقع مصنع الفنان وعاوز أطلب واستفسر عن الموديلات المتاحة')}`}
                 target="_blank"
                 rel="noreferrer"
-                className="px-6 py-3.5 text-sm font-bold text-emerald-900 bg-emerald-100/80 hover:bg-emerald-200/80 rounded-xl border border-emerald-300 transition-all flex items-center gap-2"
+                className="w-full sm:w-auto px-6 py-3.5 text-sm font-bold text-emerald-900 bg-emerald-100/80 hover:bg-emerald-200/80 rounded-xl border border-emerald-300 transition-all flex items-center justify-center gap-2"
               >
                 <MessageCircle className="w-4 h-4 text-emerald-700" />
                 <span>طلب واستفسار فوري واتساب</span>
@@ -65,7 +65,7 @@ export const Hero: React.FC<HeroProps> = ({ onExploreCatalog, onExploreReviews }
 
               <button
                 onClick={onExploreReviews}
-                className="px-4 py-3.5 text-xs font-semibold text-stone-700 hover:text-stone-950 hover:bg-stone-100 rounded-xl transition-colors cursor-pointer flex items-center gap-1.5"
+                className="w-full sm:w-auto px-4 py-3 text-xs font-semibold text-stone-700 hover:text-stone-950 hover:bg-stone-100 rounded-xl transition-colors cursor-pointer flex items-center justify-center gap-1.5"
               >
                 <Star className="w-4 h-4 fill-amber-400 text-amber-500" />
                 <span>قراءة آراء الزبائن (1,480+ تقييم)</span>
