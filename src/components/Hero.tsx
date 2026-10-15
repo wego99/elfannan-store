@@ -17,19 +17,19 @@ export const Hero: React.FC<HeroProps> = ({ onExploreCatalog, onExploreReviews }
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-stretch">
           
           {/* Right Column (Arabic RTL: text intro first) */}
-          <div className="lg:col-span-7 flex flex-col justify-center text-right space-y-6">
+          <div className="lg:col-span-7 flex flex-col justify-center text-right space-y-5 sm:space-y-6">
             
-            {/* Quiet metadata kicker (No candy pills) */}
-            <div className="flex items-center gap-2 text-xs font-semibold text-rose-900 tracking-wide">
-              <span>مصنع ومول الفنان للملابس الجاهزة</span>
+            {/* Quiet metadata kicker */}
+            <div className="flex flex-wrap items-center gap-1.5 sm:gap-2 text-[11px] sm:text-xs font-semibold text-rose-950 tracking-wide">
+              <span>مصنع وسنتر الفنان للملابس</span>
               <span aria-hidden="true" className="text-stone-300">·</span>
-              <span>الكردي - المنصورة</span>
+              <span>الكردي، المنصورة</span>
               <span aria-hidden="true" className="text-stone-300">·</span>
-              <span className="text-emerald-700">مفتوح يومياً</span>
+              <span className="text-emerald-700 font-bold">مفتوح يومياً للجمهور</span>
             </div>
 
             {/* Display Headline */}
-            <h1 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-stone-900 leading-[1.25] tracking-tight">
+            <h1 className="text-2xl sm:text-4xl lg:text-5xl font-extrabold text-stone-900 leading-snug sm:leading-[1.25] tracking-tight">
               أفخم ملابس بيتي وهوم وير تركي{' '}
               <span className="text-rose-900 underline decoration-rose-300 decoration-wavy decoration-2">
                 من المصنع مباشرة
@@ -38,15 +38,15 @@ export const Hero: React.FC<HeroProps> = ({ onExploreCatalog, onExploreReviews }
             </h1>
 
             {/* Supporting Prose */}
-            <p className="text-base sm:text-lg text-stone-600 leading-relaxed max-w-2xl font-normal">
+            <p className="text-sm sm:text-lg text-stone-600 leading-relaxed max-w-2xl font-normal">
               أهلاً بكم في الصرح الرسمي لسنتر ومصنع الفنان. تشكيلة حصرية من أطقم البيجامات الميلتون والقطيفة وخامات القطن المصري والتركي، بتصميمات عصرية وأسعار جملة أصلية تناسب كل بيت وعروسة بتجهز.
             </p>
 
             {/* Key Action Buttons */}
-            <div className="flex flex-col sm:flex-row flex-wrap items-stretch sm:items-center gap-3 pt-2">
+            <div className="flex flex-col sm:flex-row flex-wrap items-stretch sm:items-center gap-2.5 sm:gap-3 pt-1">
               <button
                 onClick={onExploreCatalog}
-                className="w-full sm:w-auto px-6 py-3.5 text-sm font-bold text-white bg-rose-950 hover:bg-rose-900 rounded-xl shadow-md transition-all flex items-center justify-center gap-2 cursor-pointer"
+                className="w-full sm:w-auto px-6 py-3 sm:py-3.5 text-xs sm:text-sm font-bold text-white bg-rose-950 hover:bg-rose-900 rounded-xl shadow-md transition-all flex items-center justify-center gap-2 cursor-pointer"
               >
                 <ShoppingBag className="w-4 h-4" />
                 <span>تصفح كولكشن الشتاء والبيتي</span>
@@ -57,7 +57,7 @@ export const Hero: React.FC<HeroProps> = ({ onExploreCatalog, onExploreReviews }
                 href={`https://wa.me/${STORE_INFO.whatsappNumber}?text=${encodeURIComponent('السلام عليكم، شفت موقع مصنع الفنان وعاوز أطلب واستفسر عن الموديلات المتاحة')}`}
                 target="_blank"
                 rel="noreferrer"
-                className="w-full sm:w-auto px-6 py-3.5 text-sm font-bold text-emerald-900 bg-emerald-100/80 hover:bg-emerald-200/80 rounded-xl border border-emerald-300 transition-all flex items-center justify-center gap-2"
+                className="w-full sm:w-auto px-6 py-3 sm:py-3.5 text-xs sm:text-sm font-bold text-emerald-900 bg-emerald-100/80 hover:bg-emerald-200/80 rounded-xl border border-emerald-300 transition-all flex items-center justify-center gap-2"
               >
                 <MessageCircle className="w-4 h-4 text-emerald-700" />
                 <span>طلب واستفسار فوري واتساب</span>
@@ -65,7 +65,7 @@ export const Hero: React.FC<HeroProps> = ({ onExploreCatalog, onExploreReviews }
 
               <button
                 onClick={onExploreReviews}
-                className="w-full sm:w-auto px-4 py-3 text-xs font-semibold text-stone-700 hover:text-stone-950 hover:bg-stone-100 rounded-xl transition-colors cursor-pointer flex items-center justify-center gap-1.5"
+                className="w-full sm:w-auto px-4 py-2.5 sm:py-3 text-xs font-semibold text-stone-700 hover:text-stone-950 hover:bg-stone-100 rounded-xl transition-colors cursor-pointer flex items-center justify-center gap-1.5"
               >
                 <Star className="w-4 h-4 fill-amber-400 text-amber-500" />
                 <span>قراءة آراء الزبائن (1,480+ تقييم)</span>
@@ -73,34 +73,34 @@ export const Hero: React.FC<HeroProps> = ({ onExploreCatalog, onExploreReviews }
             </div>
 
             {/* Direct Value Pillars Row */}
-            <div className="pt-4 grid grid-cols-2 sm:grid-cols-3 gap-4 border-t border-stone-200/80 text-xs">
-              <div className="flex items-start gap-2.5">
+            <div className="pt-3 sm:pt-4 grid grid-cols-1 sm:grid-cols-3 gap-2.5 sm:gap-4 border-t border-stone-200/80 text-xs">
+              <div className="flex items-center sm:items-start gap-2.5 p-2 sm:p-0 bg-stone-50/80 sm:bg-transparent rounded-xl border sm:border-0 border-stone-200/60">
                 <div className="p-2 rounded-lg bg-rose-50 text-rose-900 shrink-0">
                   <ShieldCheck className="w-4 h-4" />
                 </div>
                 <div>
                   <span className="block font-bold text-stone-900">حق المعاينة الكاملة</span>
-                  <span className="text-stone-500">افتح وعاين خامتك قبل الدفع</span>
+                  <span className="text-stone-500 text-[11px] sm:text-xs">افتح وعاين خامتك قبل الدفع</span>
                 </div>
               </div>
 
-              <div className="flex items-start gap-2.5">
+              <div className="flex items-center sm:items-start gap-2.5 p-2 sm:p-0 bg-stone-50/80 sm:bg-transparent rounded-xl border sm:border-0 border-stone-200/60">
                 <div className="p-2 rounded-lg bg-amber-50 text-amber-900 shrink-0">
                   <Award className="w-4 h-4" />
                 </div>
                 <div>
                   <span className="block font-bold text-stone-900">خامات تركي & مصري</span>
-                  <span className="text-stone-500">أقطان معالجة وثبات ألوان</span>
+                  <span className="text-stone-500 text-[11px] sm:text-xs">أقطان معالجة وثبات ألوان</span>
                 </div>
               </div>
 
-              <div className="flex items-start gap-2.5 col-span-2 sm:col-span-1">
+              <div className="flex items-center sm:items-start gap-2.5 p-2 sm:p-0 bg-stone-50/80 sm:bg-transparent rounded-xl border sm:border-0 border-stone-200/60">
                 <div className="p-2 rounded-lg bg-emerald-50 text-emerald-900 shrink-0">
                   <Truck className="w-4 h-4" />
                 </div>
                 <div>
-                  <span className="block font-bold text-stone-900">شحن لكل مصر</span>
-                  <span className="text-stone-500">توصيل سريع لباب بيتك</span>
+                  <span className="block font-bold text-stone-900">شحن لكافة المحافظات</span>
+                  <span className="text-stone-500 text-[11px] sm:text-xs">توصيل سريع لباب بيتك</span>
                 </div>
               </div>
             </div>

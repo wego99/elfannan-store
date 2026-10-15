@@ -11,10 +11,10 @@ export const FloatingWheelTrigger: React.FC<FloatingWheelTriggerProps> = ({
   hasWonDiscount,
 }) => {
   return (
-    <div className="fixed bottom-5 left-5 z-40">
+    <div className="fixed bottom-4 left-4 sm:bottom-6 sm:left-6 z-40">
       <button
         onClick={onOpenWheel}
-        className="group relative flex items-center gap-2.5 px-4 py-2.5 bg-gradient-to-r from-amber-600 via-rose-700 to-amber-600 hover:from-amber-500 hover:to-rose-600 text-white rounded-full shadow-xl hover:shadow-2xl border border-amber-300/40 transition-all duration-300 hover:scale-105 cursor-pointer active:scale-95"
+        className="group relative flex items-center gap-2 p-3 sm:px-4 sm:py-2.5 bg-gradient-to-r from-amber-600 via-rose-700 to-amber-600 hover:from-amber-500 hover:to-rose-600 text-white rounded-full shadow-xl hover:shadow-2xl border border-amber-300/40 transition-all duration-300 hover:scale-105 cursor-pointer active:scale-95"
         aria-label="افتح عجلة الحظ واربح خصم فوري"
       >
         {/* Animated Glow Halo */}
@@ -24,7 +24,7 @@ export const FloatingWheelTrigger: React.FC<FloatingWheelTriggerProps> = ({
           🎡
         </div>
 
-        <div className="text-right">
+        <div className="text-right hidden sm:block">
           <span className="block text-xs font-black tracking-tight leading-tight whitespace-nowrap">
             {hasWonDiscount ? 'كوبون الهدية نشط 🎁' : 'عجلة الحظ والهدايا'}
           </span>
@@ -33,7 +33,7 @@ export const FloatingWheelTrigger: React.FC<FloatingWheelTriggerProps> = ({
           </span>
         </div>
 
-        <Sparkles className="w-3.5 h-3.5 text-amber-300 animate-spin duration-3000 hidden sm:block" />
+        <Sparkles className="w-3.5 h-3.5 text-amber-300 animate-spin duration-3000 hidden md:block" />
       </button>
     </div>
   );
