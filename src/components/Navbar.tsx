@@ -97,8 +97,8 @@ export const Navbar: React.FC<NavbarProps> = ({
             </button>
           </div>
 
-          {/* Zone 2: 4-5 Clean Nav Links */}
-          <nav className="hidden md:flex items-center gap-8 text-sm font-medium text-stone-600">
+          {/* Zone 2: Clean Nav Links (Anti-slop, clean typography) */}
+          <nav className="hidden lg:flex items-center gap-7 text-sm font-medium text-stone-600">
             <button
               onClick={() => handleNavClick('catalog')}
               className="hover:text-stone-950 transition-colors cursor-pointer whitespace-nowrap"
@@ -107,7 +107,7 @@ export const Navbar: React.FC<NavbarProps> = ({
             </button>
             <button
               onClick={() => handleNavClick('offers')}
-              className="hover:text-stone-950 transition-colors cursor-pointer whitespace-nowrap text-rose-700 font-semibold"
+              className="hover:text-rose-950 text-rose-900 font-semibold transition-colors cursor-pointer whitespace-nowrap"
             >
               عروض الأوكازيون
             </button>
@@ -119,12 +119,10 @@ export const Navbar: React.FC<NavbarProps> = ({
             </button>
             <button
               onClick={() => handleNavClick('reviews')}
-              className="hover:text-stone-950 transition-colors cursor-pointer whitespace-nowrap flex items-center gap-1.5"
+              className="hover:text-stone-950 transition-colors cursor-pointer whitespace-nowrap flex items-center gap-1"
             >
               <span>آراء العملاء</span>
-              <span className="text-xs bg-rose-50 text-rose-800 font-bold px-1.5 py-0.5 rounded-md border border-rose-200">
-                ⭐ 4.9
-              </span>
+              <span className="text-xs text-amber-600 font-bold">★ 4.9</span>
             </button>
             <button
               onClick={() => handleNavClick('contact')}
@@ -134,76 +132,53 @@ export const Navbar: React.FC<NavbarProps> = ({
             </button>
           </nav>
 
-          {/* Zone 3: Primary Action, User & Cart */}
+          {/* Zone 3: Primary Action, User & Cart (Harmonized, anti-clash) */}
           <div className="flex items-center gap-2.5 shrink-0">
-            {/* Admin Exclusive: Compact Add & Manage Products Button */}
-            {currentUser?.role === 'admin' && onOpenAddProduct && (
-              <button
-                type="button"
-                onClick={onOpenAddProduct}
-                className="hidden sm:inline-flex items-center gap-1.5 px-3 py-2 text-xs font-bold text-amber-950 bg-gradient-to-r from-amber-100 to-amber-200 hover:from-amber-200 hover:to-amber-300 rounded-lg border border-amber-300/80 transition-all shadow-xs cursor-pointer whitespace-nowrap"
-                title="إضافة وتعديل وحذف الموديلات (خاص بالإدارة)"
-              >
-                <Plus className="w-3.5 h-3.5 text-amber-800" />
-                <span>+ إضافة وإدارة الموديلات 👑</span>
-              </button>
-            )}
-
-            {/* User Account / Login Button */}
-            {currentUser ? (
-              <button
-                type="button"
-                onClick={onOpenAuth}
-                className={`px-3 py-2 text-xs font-bold rounded-lg border transition-colors flex items-center gap-1.5 cursor-pointer whitespace-nowrap ${
-                  currentUser.role === 'admin'
-                    ? 'text-rose-950 bg-rose-50 hover:bg-rose-100 border-rose-200'
-                    : 'text-stone-800 bg-stone-100 hover:bg-stone-200 border-stone-200'
-                }`}
-              >
-                {currentUser.role === 'admin' ? (
-                  <>
-                    <Crown className="w-3.5 h-3.5 text-amber-600" />
-                    <span className="truncate max-w-[120px]">
-                      {currentUser.name.includes('وجيه') ? 'المدير: وجيه' : 'حساب المدير'}
-                    </span>
-                  </>
-                ) : (
-                  <>
-                    <UserIcon className="w-3.5 h-3.5 text-stone-600" />
-                    <span className="truncate max-w-[85px]">{currentUser.name}</span>
-                  </>
+            {/* If Admin: Single Elegant Management Control */}
+            {currentUser?.role === 'admin' ? (
+              <div className="flex items-center gap-1.5 bg-stone-100/90 p-1 rounded-xl border border-stone-200 shadow-2xs">
+                {onOpenAddProduct && (
+                  <button
+                    type="button"
+                    onClick={onOpenAddProduct}
+                    className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold text-white bg-rose-950 hover:bg-rose-900 rounded-lg transition-all shadow-xs cursor-pointer whitespace-nowrap"
+                    title="لوحة تحكم وتعديل وحذف الموديلات"
+                  >
+                    <Plus className="w-3.5 h-3.5" />
+                    <span>إدارة الموديلات</span>
+                  </button>
                 )}
-              </button>
+                <button
+                  type="button"
+                  onClick={onOpenAuth}
+                  className="px-2.5 py-1.5 text-xs font-semibold text-stone-700 hover:text-stone-950 hover:bg-white rounded-lg transition-colors flex items-center gap-1 cursor-pointer whitespace-nowrap"
+                  title="بيانات الحساب وتسجيل الخروج"
+                >
+                  <Crown className="w-3.5 h-3.5 text-amber-600" />
+                  <span className="hidden sm:inline">المدير</span>
+                </button>
+              </div>
             ) : (
               <button
                 type="button"
                 onClick={onOpenAuth}
-                className="px-3 py-2 text-xs font-bold text-stone-700 hover:text-stone-900 bg-stone-50 hover:bg-stone-100 rounded-lg border border-stone-200 transition-colors flex items-center gap-1.5 cursor-pointer whitespace-nowrap"
+                className="px-3 py-2 text-xs font-semibold text-stone-700 hover:text-stone-950 bg-stone-50 hover:bg-stone-100 rounded-xl border border-stone-200 transition-colors flex items-center gap-1.5 cursor-pointer whitespace-nowrap"
               >
                 <UserIcon className="w-3.5 h-3.5 text-stone-500" />
-                <span>دخول / حسابي</span>
+                <span>{currentUser ? currentUser.name : 'دخول / حسابي'}</span>
               </button>
             )}
 
-            <a
-              href={`https://wa.me/${STORE_INFO.whatsappNumber}?text=${encodeURIComponent('السلام عليكم، أرغب بالاستفسار عن كولكشن مصنع الفنان للملابس البيتي')}`}
-              target="_blank"
-              rel="noreferrer"
-              className="hidden lg:inline-flex items-center gap-2 px-3 py-2 text-xs font-semibold text-emerald-800 bg-emerald-50 hover:bg-emerald-100 rounded-lg border border-emerald-200 transition-colors whitespace-nowrap"
-            >
-              <MessageCircle className="w-4 h-4 text-emerald-600" />
-              <span>واتساب</span>
-            </a>
-
+            {/* Shopping Cart Button */}
             <button
               onClick={onOpenCart}
-              className="relative p-2.5 text-stone-700 hover:text-stone-950 hover:bg-stone-100 rounded-xl transition-all cursor-pointer flex items-center gap-2 border border-stone-200"
+              className="relative p-2.5 px-3 text-stone-800 hover:text-stone-950 bg-stone-100 hover:bg-stone-200/80 rounded-xl transition-all cursor-pointer flex items-center gap-2 border border-stone-200/90 shadow-2xs"
               aria-label="حقيبة التسوق"
             >
-              <ShoppingBag className="w-5 h-5 text-stone-800" />
+              <ShoppingBag className="w-4 h-4 text-stone-800" />
               <span className="hidden sm:inline text-xs font-bold text-stone-800">السلة</span>
               {cartCount > 0 && (
-                <span className="absolute -top-1.5 -right-1.5 bg-rose-600 text-white text-[11px] font-bold w-5 h-5 rounded-full flex items-center justify-center shadow-xs">
+                <span className="bg-rose-900 text-white text-[11px] font-bold px-1.5 min-w-5 h-5 rounded-full flex items-center justify-center shadow-xs">
                   {cartCount}
                 </span>
               )}
@@ -212,7 +187,7 @@ export const Navbar: React.FC<NavbarProps> = ({
             {/* Mobile Menu Toggle Button */}
             <button
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className="md:hidden p-2 text-stone-700 hover:text-stone-950 rounded-lg hover:bg-stone-100 transition-colors"
+              className="lg:hidden p-2 text-stone-700 hover:text-stone-950 rounded-lg hover:bg-stone-100 transition-colors"
               aria-label="القائمة"
             >
               {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
@@ -275,10 +250,10 @@ export const Navbar: React.FC<NavbarProps> = ({
                     setMobileMenuOpen(false);
                     onOpenAddProduct();
                   }}
-                  className="w-full py-2.5 text-center text-xs font-bold text-amber-950 bg-amber-100 hover:bg-amber-200 border border-amber-300 rounded-lg flex items-center justify-center gap-1.5 cursor-pointer"
+                  className="w-full py-2.5 text-center text-xs font-bold text-white bg-rose-950 hover:bg-rose-900 rounded-xl flex items-center justify-center gap-1.5 cursor-pointer shadow-xs transition-colors"
                 >
-                  <Plus className="w-4 h-4 text-amber-800" />
-                  <span>+ إضافة وتعديل وإدارة الموديلات 👑</span>
+                  <Plus className="w-4 h-4" />
+                  <span>إدارة وتعديل الموديلات</span>
                 </button>
               )}
 

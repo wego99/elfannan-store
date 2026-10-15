@@ -42,29 +42,17 @@ export default function App() {
     return INITIAL_PRODUCTS;
   });
 
-  // Current logged in user (admin wageh8918@gmail.com or customer)
+  // Current logged in user (null by default: only active when user explicitly logs in)
   const [currentUser, setCurrentUser] = useState<User | null>(() => {
     try {
       const saved = localStorage.getItem('el_fannan_current_user');
       if (saved) {
-        const parsed = JSON.parse(saved);
-        if (parsed.role === 'admin' && !parsed.email) {
-          parsed.email = 'wageh8918@gmail.com';
-        }
-        return parsed;
+        return JSON.parse(saved);
       }
     } catch (e) {
       console.error(e);
     }
-    // Default to the official store admin so wageh8918@gmail.com can manage immediately
-    return {
-      id: 'admin-1',
-      username: 'wageh8918',
-      email: 'wageh8918@gmail.com',
-      name: 'وجيه موسى (مدير مصنع وسنتر الفنان)',
-      role: 'admin',
-      phone: '01024008276',
-    };
+    return null;
   });
 
   // Product currently being edited in AddProductModal
@@ -287,13 +275,23 @@ export default function App() {
     return false;
   };
 
-  // Auth Handlers
+  // Auth Handlers (Session is stored ONLY on the device where the user logs in)
   const handleLoginSuccess = (user: User) => {
     setCurrentUser(user);
+    try {
+      localStorage.setItem('el_fannan_current_user', JSON.stringify(user));
+    } catch (e) {
+      console.error(e);
+    }
   };
 
   const handleLogout = () => {
     setCurrentUser(null);
+    try {
+      localStorage.removeItem('el_fannan_current_user');
+    } catch (e) {
+      console.error(e);
+    }
   };
 
   // Admin Add Product Handler with Supabase cloud persistence
