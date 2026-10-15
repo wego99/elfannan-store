@@ -2,6 +2,7 @@ import React, { useState, useMemo } from 'react';
 import { Search, SlidersHorizontal, Sparkles, Plus, ShieldCheck } from 'lucide-react';
 import { Product } from '../types';
 import { ProductCard } from './ProductCard';
+import { SupabaseSyncBanner } from './SupabaseSyncBanner';
 
 interface ProductCatalogProps {
   products: Product[];
@@ -10,6 +11,11 @@ interface ProductCatalogProps {
   isAdmin?: boolean;
   onOpenAddProduct?: () => void;
   onDeleteProduct?: (id: string) => void;
+  supabaseProductCount?: number;
+  isSupabaseLoading?: boolean;
+  rlsWarning?: boolean;
+  onRefreshSupabase?: () => Promise<void>;
+  onSeedSupabase?: () => Promise<void>;
 }
 
 type CategoryFilter = 'all' | 'winter' | 'turkish' | 'cotton' | 'velvet' | 'offers';
@@ -21,6 +27,11 @@ export const ProductCatalog: React.FC<ProductCatalogProps> = ({
   isAdmin,
   onOpenAddProduct,
   onDeleteProduct,
+  supabaseProductCount = 0,
+  isSupabaseLoading = false,
+  rlsWarning = false,
+  onRefreshSupabase,
+  onSeedSupabase,
 }) => {
   const [activeCategory, setActiveCategory] = useState<CategoryFilter>('all');
   const [searchQuery, setSearchQuery] = useState('');
@@ -93,6 +104,18 @@ export const ProductCatalog: React.FC<ProductCatalogProps> = ({
             </div>
           )}
         </div>
+
+        {/* Supabase Cloud Database Status Banner for Admin */}
+        {isAdmin && onRefreshSupabase && onSeedSupabase && (
+          <SupabaseSyncBanner
+            supabaseProductCount={supabaseProductCount}
+            totalProductsCount={products.length}
+            isLoading={isSupabaseLoading}
+            rlsWarning={rlsWarning}
+            onRefresh={onRefreshSupabase}
+            onSeedDefaults={onSeedSupabase}
+          />
+        )}
 
         {/* Filter Controls & Search Bar */}
         <div className="bg-stone-50 rounded-2xl p-4 mb-8 border border-stone-200/80 space-y-4">

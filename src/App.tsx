@@ -2,6 +2,12 @@ import React, { useState, useEffect } from 'react';
 import { Product, Review, CartItem, User } from './types';
 import { INITIAL_PRODUCTS, INITIAL_REVIEWS, STORE_INFO } from './data/mockData';
 import { normalizeImagePath } from './utils/imageUtils';
+import {
+  fetchProductsFromSupabase,
+  addProductToSupabase,
+  deleteProductFromSupabase,
+  seedProductsToSupabase,
+} from './lib/supabase';
 import { Navbar } from './components/Navbar';
 import { Hero } from './components/Hero';
 import { ProductCatalog } from './components/ProductCatalog';
@@ -100,6 +106,35 @@ export default function App() {
   const [isWheelOpen, setIsWheelOpen] = useState(false);
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
   const [isAddProductModalOpen, setIsAddProductModalOpen] = useState(false);
+
+  // Supabase Database Sync State
+  const [isSupabaseLoading, setIsSupabaseLoading] = useState(false);
+  const [supabaseProductCount, setSupabaseProductCount] = useState(0);
+  const [rlsWarning, setRlsWarning] = useState(false);
+
+  // Fetch products from Supabase on mount
+  const loadProducts = async () => {
+    setIsSupabaseLoading(true);
+    try {
+      const { data, error, isEmpty } = await fetchProductsFromSupabase();
+      if (error) {
+        console.warn('Supabase fetch error, fallback to local products:', error);
+      } else if (data && data.length > 0) {
+        setProducts(data);
+        setSupabaseProductCount(data.length);
+      } else if (isEmpty) {
+        setSupabaseProductCount(0);
+      }
+    } catch (e) {
+      console.error('Supabase load error:', e);
+    } finally {
+      setIsSupabaseLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    loadProducts();
+  }, []);
 
   // Sync products to LocalStorage
   useEffect(() => {
@@ -245,18 +280,66 @@ export default function App() {
     setCurrentUser(null);
   };
 
-  // Admin Add Product Handler
-  const handleAddProduct = (newProd: Product) => {
+  // Admin Add Product Handler with Supabase cloud persistence
+  const handleAddProduct = async (
+    newProd: Product
+  ): Promise<{ success: boolean; rlsError?: boolean }> => {
     const sanitizedProd: Product = {
       ...newProd,
       image: normalizeImagePath(newProd.image),
     };
-    setProducts((prev) => [sanitizedProd, ...prev]);
+
+    // 1. Save directly to Supabase products table (columns: title, price, image)
+    const { data: supaData, error: supaError, rlsError } = await addProductToSupabase({
+      title: sanitizedProd.title,
+      price: sanitizedProd.price,
+      image: sanitizedProd.image,
+    });
+
+    if (rlsError) {
+      setRlsWarning(true);
+    }
+
+    // Attach generated database ID if available
+    const finalProduct: Product = {
+      ...sanitizedProd,
+      id: supaData?.id ? String(supaData.id) : sanitizedProd.id,
+    };
+
+    setProducts((prev) => [finalProduct, ...prev]);
+
+    if (!rlsError && supaData) {
+      setSupabaseProductCount((c) => c + 1);
+    }
+
+    return { success: !supaError, rlsError };
   };
 
-  // Admin Delete Product Handler
-  const handleDeleteProduct = (productId: string) => {
+  // Admin Delete Product Handler with Supabase deletion
+  const handleDeleteProduct = async (productId: string) => {
     setProducts((prev) => prev.filter((p) => p.id !== productId));
+    const { error, rlsError } = await deleteProductFromSupabase(productId);
+    if (rlsError) {
+      setRlsWarning(true);
+    } else if (!error) {
+      setSupabaseProductCount((c) => Math.max(0, c - 1));
+    }
+  };
+
+  // Admin Seed Products to Supabase
+  const handleSeedSupabase = async () => {
+    setIsSupabaseLoading(true);
+    try {
+      const { count, error, rlsError } = await seedProductsToSupabase(products);
+      if (rlsError) {
+        setRlsWarning(true);
+      } else if (count > 0) {
+        setSupabaseProductCount(count);
+        await loadProducts();
+      }
+    } finally {
+      setIsSupabaseLoading(false);
+    }
   };
 
   // Add new customer review
@@ -327,7 +410,7 @@ export default function App() {
           offerProduct={comboOfferProduct}
         />
 
-        {/* Product Catalog with Admin controls */}
+        {/* Product Catalog with Admin controls and Supabase database status */}
         <ProductCatalog
           products={products}
           onQuickView={(p) => setQuickViewProduct(p)}
@@ -335,6 +418,11 @@ export default function App() {
           isAdmin={currentUser?.role === 'admin'}
           onOpenAddProduct={() => setIsAddProductModalOpen(true)}
           onDeleteProduct={handleDeleteProduct}
+          supabaseProductCount={supabaseProductCount}
+          isSupabaseLoading={isSupabaseLoading}
+          rlsWarning={rlsWarning}
+          onRefreshSupabase={loadProducts}
+          onSeedSupabase={handleSeedSupabase}
         />
 
         {/* Authentic Customer Reviews Section */}

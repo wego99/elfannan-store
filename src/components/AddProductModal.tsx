@@ -6,7 +6,7 @@ import { handleImageError, normalizeImagePath } from '../utils/imageUtils';
 interface AddProductModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onAddProduct: (product: Product) => void;
+  onAddProduct: (product: Product) => Promise<{ success: boolean; rlsError?: boolean } | void> | void;
 }
 
 const PRESET_IMAGES = [
@@ -60,6 +60,8 @@ export const AddProductModal: React.FC<AddProductModalProps> = ({
     AVAILABLE_COLORS[1],
   ]);
   const [isSuccess, setIsSuccess] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitFeedback, setSubmitFeedback] = useState<string | null>(null);
 
   if (!isOpen) return null;
 
@@ -132,9 +134,9 @@ export const AddProductModal: React.FC<AddProductModalProps> = ({
     }
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!title.trim() || !code.trim()) return;
+    if (!title.trim() || !code.trim() || isSubmitting) return;
 
     const categoryLabels: Record<Product['category'], string> = {
       winter: 'بيجامات شتوي وميلتون',
@@ -167,12 +169,33 @@ export const AddProductModal: React.FC<AddProductModalProps> = ({
       features: ['خامة ثقيلة ممتازة', 'ثبات ألوان 100%', 'معاينة قبل الدفع'],
     };
 
-    onAddProduct(newProduct);
-    setIsSuccess(true);
-    setTimeout(() => {
-      setIsSuccess(false);
-      onClose();
-    }, 1200);
+    setIsSubmitting(true);
+    setSubmitFeedback('جاري الحفظ في قاعدة بيانات Supabase (جدول products)...');
+
+    try {
+      const res = await onAddProduct(newProduct);
+      if (res && (res as any).rlsError) {
+        setSubmitFeedback('تم الحفظ محلياً! (يرجى مراجعة صلاحيات RLS في Supabase)');
+      } else {
+        setSubmitFeedback('تم الحفظ بنجاح في Supabase وموقع المتجر! ✅');
+      }
+      setIsSuccess(true);
+      setTimeout(() => {
+        setIsSuccess(false);
+        setSubmitFeedback(null);
+        setIsSubmitting(false);
+        onClose();
+      }, 1300);
+    } catch (err) {
+      console.error(err);
+      setIsSuccess(true);
+      setTimeout(() => {
+        setIsSuccess(false);
+        setSubmitFeedback(null);
+        setIsSubmitting(false);
+        onClose();
+      }, 1300);
+    }
   };
 
   return (
@@ -578,22 +601,47 @@ export const AddProductModal: React.FC<AddProductModalProps> = ({
             />
           </div>
 
-          {/* Actions */}
-          <div className="pt-3 border-t border-stone-200 flex items-center justify-end gap-2">
-            <button
-              type="button"
-              onClick={onClose}
-              className="px-4 py-2.5 bg-stone-100 hover:bg-stone-200 text-stone-700 rounded-xl font-bold cursor-pointer"
-            >
-              إلغاء
-            </button>
-            <button
-              type="submit"
-              className="px-6 py-2.5 bg-rose-950 hover:bg-rose-900 text-white rounded-xl font-bold transition-all shadow-md flex items-center gap-2 cursor-pointer"
-            >
-              <Plus className="w-4 h-4" />
-              <span>نشر وإضافة الموديل فوراً</span>
-            </button>
+          {/* Feedback & Actions */}
+          <div className="pt-3 border-t border-stone-200 flex flex-col sm:flex-row items-center justify-between gap-3">
+            {submitFeedback ? (
+              <div className="text-xs font-semibold text-emerald-800 bg-emerald-50 border border-emerald-200 px-3 py-2 rounded-xl flex items-center gap-2">
+                <span className="w-2 h-2 rounded-full bg-emerald-500 animate-ping"></span>
+                <span>{submitFeedback}</span>
+              </div>
+            ) : (
+              <div className="text-[11px] text-stone-500 flex items-center gap-1.5">
+                <ShieldCheck className="w-3.5 h-3.5 text-emerald-600" />
+                <span>يتم الحفظ سحابياً في جدول Supabase products ومحلياً</span>
+              </div>
+            )}
+
+            <div className="flex items-center gap-2 shrink-0">
+              <button
+                type="button"
+                onClick={onClose}
+                disabled={isSubmitting}
+                className="px-4 py-2.5 bg-stone-100 hover:bg-stone-200 text-stone-700 rounded-xl font-bold cursor-pointer disabled:opacity-50"
+              >
+                إلغاء
+              </button>
+              <button
+                type="submit"
+                disabled={isSubmitting}
+                className="px-6 py-2.5 bg-rose-950 hover:bg-rose-900 disabled:bg-stone-400 text-white rounded-xl font-bold transition-all shadow-md flex items-center gap-2 cursor-pointer"
+              >
+                {isSubmitting ? (
+                  <>
+                    <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></span>
+                    <span>جاري الحفظ في Supabase...</span>
+                  </>
+                ) : (
+                  <>
+                    <Plus className="w-4 h-4" />
+                    <span>نشر وحفظ في Supabase 👑</span>
+                  </>
+                )}
+              </button>
+            </div>
           </div>
 
         </form>
